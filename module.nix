@@ -22,7 +22,7 @@ in {
     environment = {
       shells = [cfg.package];
       systemPackages = [cfg.package];
-      users.defaultUserShell = cfg.package;
     };
+    users.defaultUserShell = cfg.package;
   };
 }
