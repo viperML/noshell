@@ -64,25 +64,19 @@ char *getshell(void) {
 }
 
 int main(int argc, char *argv[]) {
+  (void)argc;
   char *shell = getshell();
+
   if (shell == NULL) {
     fprintf(stderr, "ERROR: Failed to detect shell");
     return EXIT_FAILURE;
   }
+
   fprintf(stderr, "INFO: Using %s\n", shell);
 
-  char *new_argv[argc + 1];
-  for (int i = 0; i < argc; i++) {
-    new_argv[i] = strdup(argv[i]);
-  }
-  new_argv[argc] = NULL;
+  argv[0] = shell;
+  execvp(shell, argv);
 
-  new_argv[0] = shell;
-  int ret = execvp(shell, new_argv);
-  if (ret == -1) {
-    perror("error executing shell");
-    return 1;
-  }
-
-  return EXIT_FAILURE; // unreachable
+  perror("ERROR: Failed to execute shell");
+  return EXIT_FAILURE;
 }
