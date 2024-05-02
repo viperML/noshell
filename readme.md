@@ -11,17 +11,5 @@ superuser permissions to modify `/etc/passwd` and `/etc/shells`.
 
 ## Usage
 
-```nix
-# pass your flake inputs however you want
-{ config, inputs, ... }: let
-  noshell = inputs.noshell.packages.x86_64-linux.default;
-in {
-  environment.shells = [ noshell ];
-  environment.systemPackages = [ noshell ];
-
-  users.users.foo = {
-    # ....
-    shell = noshell;
-  };
-}
-```
+Add this flake's `nixosModules.default` to your NixOS imports. The shell is configured
+by default to **ALL** users.
