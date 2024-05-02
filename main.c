@@ -1,14 +1,26 @@
 #define _GNU_SOURCE
 #include <errno.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
-bool usable(char *path) {
-  if (!access(path, X_OK)) {
-    return true;
+bool usable(char const *path) {
+  char real[PATH_MAX];
+  if (realpath(path, real) == NULL) {
+    return false;
+  }
+
+  if (access(real, X_OK) == 0) {
+    struct stat sb = {};
+    if (stat(real, &sb) == 0 && S_ISREG(sb.st_mode)) {
+      return true;
+    } else {
+      return false;
+    }
   } else {
     char *msg;
     int errsv = errno;
