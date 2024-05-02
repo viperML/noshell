@@ -20,5 +20,7 @@
     devShells = forAllSystems (pkgs: {
       default = import ./shell.nix {inherit pkgs;};
     });
+
+    nixosModules.default = ./module.nix;
   };
 }
