@@ -1,29 +1,70 @@
 #define _GNU_SOURCE
-
-#include <assert.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-int main(int argc, char *argv[]) {
-  char *home = secure_getenv("HOME");
-
-  if (home == NULL) {
-    printf("HOME is unset\n");
+bool usable(char *path) {
+  if (!access(path, X_OK)) {
+    return true;
   } else {
-    printf("HOME=%s\n", home);
+    char *msg;
+    int errsv = errno;
+
+    switch (errsv) {
+    case EACCES:
+      break;
+    default:
+      asprintf(&msg, "WARN: Checking %s", path);
+      perror(msg);
+    }
+
+    return false;
+  }
+}
+
+char *getshell(void) {
+  char *relpath = "shell";
+  char *xdg_config_home = getenv("XDG_CONFIG_HOME");
+
+  char *xdg_result = NULL;
+  if (xdg_config_home != NULL) {
+    asprintf(&xdg_result, "%s/%s", xdg_config_home, relpath);
+    if (usable(xdg_result)) {
+      return xdg_result;
+    }
   }
 
-  char *new_argv[argc+1];
+  char *home = getenv("HOME");
+  if (home != NULL) {
+    char *home_result;
+    asprintf(&home_result, "%s/.config/%s", home, relpath);
+    if (strcmp(home_result, xdg_result) && usable(home_result)) {
+      return home_result;
+    };
+  }
+
+  char *fallback_result = "/bin/sh";
+  fprintf(stderr, "WARN: Falling back to %s\n", fallback_result);
+  return fallback_result;
+}
+
+int main(int argc, char *argv[]) {
+  char *shell = getshell();
+  if (shell == NULL) {
+    fprintf(stderr, "ERROR: Failed to detect shell");
+    return EXIT_FAILURE;
+  }
+  fprintf(stderr, "INFO: Using %s\n", shell);
+
+  char *new_argv[argc + 1];
   for (int i = 0; i < argc; i++) {
     new_argv[i] = strdup(argv[i]);
-    printf("argv[%d]: %s\n", i, new_argv[i]);
   }
   new_argv[argc] = NULL;
 
-  char *shell = "bash";
   new_argv[0] = shell;
   int ret = execvp(shell, new_argv);
   if (ret == -1) {
@@ -31,5 +72,5 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  return 0;
+  return EXIT_FAILURE; // unreachable
 }
