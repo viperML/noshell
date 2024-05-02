@@ -8,7 +8,7 @@ stdenv.mkDerivation {
 
   src = lib.cleanSource ./.;
 
-  nativeBuildInputs = [ cmake ];
+  nativeBuildInputs = [cmake];
 
   passthru = {
     shellPath = "/bin/noshell";
