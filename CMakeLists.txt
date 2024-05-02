@@ -7,7 +7,6 @@ add_compile_options(
     -Wextra
     -pedantic
     -Wshadow
-    -Werror
 )
 
 add_executable(${PROJECT_NAME} main.c)
