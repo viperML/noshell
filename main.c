@@ -31,6 +31,7 @@ bool usable(char const *path) {
     default:
       asprintf(&msg, "WARN: Checking %s", path);
       perror(msg);
+      free(msg);
     }
 
     return false;
@@ -60,7 +61,7 @@ char *getshell(void) {
 
   char *fallback_result = "/bin/sh";
   fprintf(stderr, "WARN: Falling back to %s\n", fallback_result);
-  return fallback_result;
+  return strdup(fallback_result);
 }
 
 int main(int argc, char *argv[]) {
@@ -76,6 +77,7 @@ int main(int argc, char *argv[]) {
 
   argv[0] = shell;
   execvp(shell, argv);
+  free(shell);
 
   perror("ERROR: Failed to execute shell");
   return EXIT_FAILURE;
