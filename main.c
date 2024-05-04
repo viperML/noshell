@@ -54,7 +54,7 @@ char* getshell(void) {
   if (home != NULL) {
     char* home_result;
     asprintf(&home_result, "%s/.config/%s", home, relpath);
-    if (strcmp(home_result, xdg_result) && usable(home_result)) {
+    if (usable(home_result)) {
       return home_result;
     };
   }
