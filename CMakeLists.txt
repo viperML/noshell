@@ -10,6 +10,11 @@ add_compile_options(
     -Wshadow
 )
 
+
+set(DEFAULT_SHELL "/bin/sh" CACHE STRING "Default shell to use as a fallback")
+
+configure_file(noshell.h.in ${CMAKE_CURRENT_SOURCE_DIR}/noshell.h @ONLY)
+
 add_executable(${PROJECT_NAME} main.c)
 
 install(TARGETS ${PROJECT_NAME})

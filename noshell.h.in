@@ -1,0 +1,6 @@
+#ifndef NOSHELL_H
+#define NOSHELL_H
+
+#define DEFAULT_SHELL "@DEFAULT_SHELL@"
+
+#endif // NOSHELL_H

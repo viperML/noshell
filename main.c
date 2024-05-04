@@ -8,6 +8,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "noshell.h"
+
 bool usable(char const* path) {
   char real[PATH_MAX];
   if (realpath(path, real) == NULL) {
@@ -65,9 +67,8 @@ char* getshell(void) {
     }
   }
 
-  char* fallback_result = "/bin/sh";
-  fprintf(stderr, "WARN: Falling back to %s\n", fallback_result);
-  return strdup(fallback_result);
+  fprintf(stderr, "WARN: Using fallback shell\n");
+  return strdup(DEFAULT_SHELL);
 }
 
 int main(int argc, char* argv[]) {
