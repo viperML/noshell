@@ -8,7 +8,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-bool usable(char const *path) {
+bool usable(char const* path) {
   char real[PATH_MAX];
   if (realpath(path, real) == NULL) {
     return false;
@@ -22,7 +22,7 @@ bool usable(char const *path) {
       return false;
     }
   } else {
-    char *msg;
+    char* msg;
     int errsv = errno;
 
     switch (errsv) {
@@ -38,11 +38,11 @@ bool usable(char const *path) {
   }
 }
 
-char *getshell(void) {
-  char *relpath = "shell";
-  char *xdg_config_home = getenv("XDG_CONFIG_HOME");
+char* getshell(void) {
+  char* relpath = "shell";
+  char* xdg_config_home = getenv("XDG_CONFIG_HOME");
 
-  char *xdg_result = NULL;
+  char* xdg_result = NULL;
   if (xdg_config_home != NULL) {
     asprintf(&xdg_result, "%s/%s", xdg_config_home, relpath);
     if (usable(xdg_result)) {
@@ -50,23 +50,23 @@ char *getshell(void) {
     }
   }
 
-  char *home = getenv("HOME");
+  char* home = getenv("HOME");
   if (home != NULL) {
-    char *home_result;
+    char* home_result;
     asprintf(&home_result, "%s/.config/%s", home, relpath);
     if (strcmp(home_result, xdg_result) && usable(home_result)) {
       return home_result;
     };
   }
 
-  char *fallback_result = "/bin/sh";
+  char* fallback_result = "/bin/sh";
   fprintf(stderr, "WARN: Falling back to %s\n", fallback_result);
   return strdup(fallback_result);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   (void)argc;
-  char *shell = getshell();
+  char* shell = getshell();
 
   if (shell == NULL) {
     fprintf(stderr, "ERROR: Failed to detect shell");
