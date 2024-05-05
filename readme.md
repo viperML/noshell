@@ -13,7 +13,7 @@ By default, noshell checks the following locations in the order:
 
 - `$XDG_CONFIG_HOME/shell`
 - `$HOME/.config/shell`
-- `/bin/sh` as the fallback
+- `pkgs.bashInteractive` as the fallback. Can be configured at build-time
 
 ## Usage
 
