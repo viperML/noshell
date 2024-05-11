@@ -40,6 +40,37 @@ bool usable(char const* path) {
   }
 }
 
+// Get argument that should be passed as zeroth
+// argument to the shell executable.
+void get_shell_arg(char* buffer, char* argv, char* shell)
+{
+  bool written = false, read_status = true;
+
+  if (argv[0] == '-') {
+    (*buffer++) = '-';
+  }
+
+  struct stat buf;
+  if (lstat(shell, &buf) != 0) {
+    perror("ERROR: shell file status cannot be read");
+    read_status = false;
+  }
+
+  if (read_status && S_ISLNK(buf.st_mode)) {
+    ssize_t len = readlink(shell, buffer, PATH_MAX);
+    if (len < 0) {
+      perror("ERROR: Failed to read shell link value");
+    } else {
+      written = true;
+      buffer[len] = '\0';
+    }
+  }
+
+  if (!written) {
+    strcpy(buffer, shell);
+  }
+}
+
 char* getshell(void) {
   char* relpath = "shell";
   char* xdg_config_home = getenv("XDG_CONFIG_HOME");
@@ -82,7 +113,10 @@ int main(int argc, char* argv[]) {
 
   fprintf(stderr, "INFO: Using %s\n", shell);
 
-  argv[0] = shell;
+  char arg_zero_buf[PATH_MAX + 1];
+  get_shell_arg(arg_zero_buf, argv[0], shell);
+  argv[0] = arg_zero_buf;
+
   execvp(shell, argv);
   free(shell);
 
