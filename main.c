@@ -71,6 +71,32 @@ char* getshell(void) {
   return strdup(DEFAULT_SHELL);
 }
 
+/// Changes argv0 depending on the filetype
+/// - Regular file: uses the basename
+/// - Symlink: dereferences the symlink once and uses the basename
+void argv0_deref(char** argv0_p) {
+  struct stat sb = {};
+  if (lstat(*argv0_p, &sb) != 0) {
+    fprintf(stderr, "WARN: Failed to stat the shell\n");
+    return;
+  }
+
+  if (S_ISREG(sb.st_mode)) {
+    *argv0_p = strdup(basename(*argv0_p));
+    return;
+  }
+
+  if (S_ISLNK(sb.st_mode)) {
+    char buf[PATH_MAX + 1];
+    if (readlink(*argv0_p, buf, PATH_MAX) == -1) {
+      fprintf(stderr, "Failed to readlink\n");
+      return;
+    }
+    *argv0_p = strdup(basename(buf));
+    return;
+  }
+}
+
 int main(int argc, char* argv[]) {
   (void)argc;
   char* shell = getshell();
@@ -82,7 +108,15 @@ int main(int argc, char* argv[]) {
 
   fprintf(stderr, "INFO: Using %s\n", shell);
 
+  bool login_dash = argv[0][0] == '-';
+
   argv[0] = shell;
+  argv0_deref(&argv[0]);
+
+  if (login_dash) {
+    asprintf(&argv[0], "-%s", argv[0]);
+  }
+
   execvp(shell, argv);
   free(shell);
 
