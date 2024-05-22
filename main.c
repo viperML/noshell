@@ -1,5 +1,5 @@
-#define _GNU_SOURCE
 #include <errno.h>
+#include <libgen.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
