@@ -10,6 +10,18 @@
 
 #include "noshell.h"
 
+static bool DEBUG = false;
+
+#define eprint_d(...)                                                          \
+  {                                                                            \
+    if (DEBUG) {                                                               \
+      fprintf(stderr, __VA_ARGS__);                                            \
+    }                                                                          \
+  };
+
+#define eprint(...)                                                            \
+  { fprintf(stderr, __VA_ARGS__); };
+
 bool usable(char const* path) {
   char real[PATH_MAX];
   if (realpath(path, real) == NULL) {
@@ -67,7 +79,7 @@ char* getshell(void) {
     }
   }
 
-  fprintf(stderr, "WARN: Using fallback shell\n");
+  eprint("WARN: Using fallback shell\n");
   return strdup(DEFAULT_SHELL);
 }
 
@@ -77,7 +89,7 @@ char* getshell(void) {
 void argv0_deref(char** argv0_p) {
   struct stat sb = {};
   if (lstat(*argv0_p, &sb) != 0) {
-    fprintf(stderr, "WARN: Failed to stat the shell\n");
+    eprint("WARN: Failed to stat the shell\n");
     return;
   }
 
@@ -89,7 +101,7 @@ void argv0_deref(char** argv0_p) {
   if (S_ISLNK(sb.st_mode)) {
     char buf[PATH_MAX + 1];
     if (readlink(*argv0_p, buf, PATH_MAX) == -1) {
-      fprintf(stderr, "Failed to readlink\n");
+      eprint("Failed to readlink\n");
       return;
     }
     *argv0_p = strdup(basename(buf));
@@ -99,14 +111,19 @@ void argv0_deref(char** argv0_p) {
 
 int main(int argc, char* argv[]) {
   (void)argc;
+
+  if (getenv("NOSHELL_DEBUG") != NULL) {
+    DEBUG = true;
+  }
+
   char* shell = getshell();
 
   if (shell == NULL) {
-    fprintf(stderr, "ERROR: Failed to detect shell");
+    eprint("ERROR: Failed to detect shell");
     return EXIT_FAILURE;
   }
 
-  fprintf(stderr, "INFO: Using %s\n", shell);
+  eprint_d("INFO: Using %s\n", shell);
 
   bool login_dash = argv[0][0] == '-';
 
