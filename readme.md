@@ -34,3 +34,18 @@ Noshell enables some patterns in the NixOS ecosystem, such as:
 - User-level configuration of the login shell with home-manager (`xdg.configFile."shell".source = lib.getExe pkgs.nushell;`)
 
 It can be useful too outside of NixOS, for example to use a custom build of some shell.
+
+## A note on login shells
+
+As far as I know, there is nothing "written in stone" about what a login shell must do, but other
+tools in Linux do expect some functionality.
+
+Some of these assumptions are:
+- The login shell is expected to `. /etc/profile` by its own. This file is a POSIX sh script that sets up environment variables needed by the session. `pam_env` also
+  sets environment variables but that is handled earlier in the login process.
+- `login` may call your shell with `-progname`, that is with a dash as the first character, to indicate that this is a login shell.
+- Other programs may call your shell with the argument `-l` to indicate that it is a login shell.
+- Some programs might assume `$SHELL` is something that you can pass arguments to, whatever the arguments are, with `-c`.
+
+Please report any functionality expected from a login shell in the issues board: [https://github.com/viperML/noshell/issues](https://github.com/viperML/noshell/issues).
+
