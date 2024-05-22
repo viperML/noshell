@@ -29,7 +29,7 @@ Noshell will be configured as the default shell to **ALL** users.
 Noshell enables some patterns in the NixOS ecosystem, such as:
 
 - Using a shell with a configuration wrapper. As the wrapper is a different program
-  that is not present in `/etc/shells`.
-- User-level configuration of the login shell with home-manager.
+  that is not present in `/etc/shells`. See https://github.com/viperML/wrapper-manager .
+- User-level configuration of the login shell with home-manager (`xdg.configFile."shell".source = lib.getExe pkgs.nushell;`)
 
 It can be useful too outside of NixOS, for example to use a custom build of some shell.
