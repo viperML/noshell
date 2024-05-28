@@ -24,5 +24,10 @@ in {
       systemPackages = [cfg.package];
     };
     users.defaultUserShell = cfg.package;
+
+    # Default root to bash
+    # defaultUserShell sets prio to 1000, we want a lower prio but still
+    # let users change this without mkForce
+    users.users.root.shell = lib.mkOverride 999 (pkgs.bashInteractive);
   };
 }
