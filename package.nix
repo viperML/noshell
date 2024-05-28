@@ -12,11 +12,22 @@
     if lib.isDerivation defaultShell
     then "${defaultShell}${defaultShell.passthru.shellPath}"
     else defaultShell;
+  fs = lib.fileset;
+  r = ./.;
 in
   stdenv.mkDerivation {
     name = "noshell";
 
-    src = lib.cleanSource ./.;
+    src = fs.toSource {
+      root = r;
+      fileset = fs.intersection (lib.fileset.fromSource (lib.sources.cleanSource r)) (
+        lib.fileset.unions [
+          (fs.fileFilter (file: file.hasExt "c") r)
+          (fs.fileFilter (file: file.hasExt "txt") r)
+          (fs.fileFilter (file: file.hasExt "in") r)
+        ]
+      );
+    };
 
     nativeBuildInputs = [cmake];
 
