@@ -79,7 +79,9 @@ char* getshell(void) {
     }
   }
 
-  eprint("WARN: Using fallback shell\n");
+  // eprint("WARN: Using fallback shell\n");
+  eprint_d("INFO: Using fallback shell\n");
+
   return strdup(DEFAULT_SHELL);
 }
 
